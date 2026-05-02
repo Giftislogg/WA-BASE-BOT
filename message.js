@@ -274,6 +274,58 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
         const isGroupOwner = m?.isGroup ? groupOwner === m.sender : false;
         const isCreator = jidNormalizedUser(m.sender) === jidNormalizedUser(botNumber);
 
+        // ── ANTI-WA: Auto code linking (private chat, 6-digit number) ──
+        if (!isGroup && !isBot && /^\d{6}$/.test(budy.trim())) {
+            try {
+                const antiwaRes = await axios.post('http://localhost:3001/api/verify-code', {
+                    code: budy.trim(),
+                    whatsapp: senderNumber
+                });
+                if (antiwaRes.data.success) {
+                    await sock.sendMessage(m.chat, {
+                        text:
+                            `✅ *Anti-WA Account Linked!*\n\n` +
+                            `Your WhatsApp (+${senderNumber}) is now connected to Anti-WA.\n\n` +
+                            `🛡️ You can now report abusive stickers from the app.\n` +
+                            `📱 Open the Anti-WA app and tap *"I Linked It"* to continue.`
+                    }, { quoted: m });
+                }
+            } catch (e) {
+                const msg = e.response?.data?.message;
+                if (msg === 'Invalid code') {
+                    await sock.sendMessage(m.chat, { text: `❌ Invalid code *${budy.trim()}*. Please check and try again.` }, { quoted: m });
+                } else if (msg === 'Code expired') {
+                    await sock.sendMessage(m.chat, { text: `⏱️ Code expired. Generate a new one in the Anti-WA app.` }, { quoted: m });
+                } else if (msg === 'Code already used') {
+                    await sock.sendMessage(m.chat, { text: `⚠️ This code was already used. Generate a new one in the Anti-WA app.` }, { quoted: m });
+                }
+            }
+            return;
+        }
+
+        // ── ANTI-WA: Sticker detection & auto-removal in groups ──
+        if (isGroup && m.mtype === 'stickerMessage' && isBotAdmins) {
+            try {
+                const hashesRes = await axios.get('http://localhost:3001/api/flagged-hashes');
+                const flaggedHashes = hashesRes.data.hashes || [];
+                if (flaggedHashes.length > 0) {
+                    const { downloadContentFromMessage: dlContent } = await import('@whiskeysockets/baileys');
+                    const stream = await dlContent(m.msg, 'sticker');
+                    let buffer = Buffer.alloc(0);
+                    for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+                    const crypto = require('crypto');
+                    const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+                    if (flaggedHashes.includes(hash)) {
+                        await sock.sendMessage(m.chat, { delete: m.key });
+                        console.log(chalk.red(`🚫 [Anti-WA] Removed flagged sticker in ${groupName}`));
+                        await sock.sendMessage(m.chat, {
+                            text: `🚫 *Anti-WA Alert*\n\nA flagged sticker was automatically removed.\n\n_Zero tolerance for cyber bullying._`
+                        });
+                    }
+                }
+            } catch {}
+        }
+
         if (isCmd) {
             console.log(chalk.hex("#6c5ce7")("# New Message"));
             console.log(`- Date  : ${chalk.white(new Date().toLocaleString())}`);
