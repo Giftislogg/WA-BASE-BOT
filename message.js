@@ -303,24 +303,57 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
             return;
         }
 
-        // ── ANTI-WA: Sticker detection & auto-removal in groups ──
-        if (isGroup && m.mtype === 'stickerMessage' && isBotAdmins) {
+        // ── ANTI-WA: Sticker/image detection, warn & auto-kick ──
+        const isMediaMsg = m.mtype === 'stickerMessage' || m.mtype === 'imageMessage';
+        if (isGroup && isMediaMsg && !isBot) {
             try {
                 const hashesRes = await axios.get('http://localhost:3001/api/flagged-hashes');
                 const flaggedHashes = hashesRes.data.hashes || [];
                 if (flaggedHashes.length > 0) {
                     const { downloadContentFromMessage: dlContent } = await import('@whiskeysockets/baileys');
-                    const stream = await dlContent(m.msg, 'sticker');
+                    const mediaType = m.mtype === 'stickerMessage' ? 'sticker' : 'image';
+                    const stream = await dlContent(m.msg, mediaType);
                     let buffer = Buffer.alloc(0);
                     for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
                     const crypto = require('crypto');
                     const hash = crypto.createHash('sha256').update(buffer).digest('hex');
                     if (flaggedHashes.includes(hash)) {
-                        await sock.sendMessage(m.chat, { delete: m.key });
-                        console.log(chalk.red(`🚫 [Anti-WA] Removed flagged sticker in ${groupName}`));
-                        await sock.sendMessage(m.chat, {
-                            text: `🚫 *Anti-WA Alert*\n\nA flagged sticker was automatically removed.\n\n_Zero tolerance for cyber bullying._`
+                        // Delete the message
+                        await sock.sendMessage(m.chat, { delete: m.key }).catch(() => {});
+                        console.log(chalk.red(`🚫 [Anti-WA] Flagged ${mediaType} detected in ${groupName} from ${senderNumber}`));
+                        // Issue warning via API
+                        const warnRes = await axios.post('http://localhost:3001/api/stats/warn', {
+                            groupJid: m.chat,
+                            userNumber: senderNumber,
+                            reason: `Sent flagged ${mediaType} (cyber bullying content)`,
+                            warnedBy: 'Anti-WA Bot'
                         });
+                        const { warnings, maxWarnings } = warnRes.data;
+                        if (warnings >= maxWarnings && isBotAdmins) {
+                            // Auto-kick after max warnings
+                            await sock.groupParticipantsUpdate(m.chat, [sender], 'remove').catch(() => {});
+                            await sock.sendMessage(m.chat, {
+                                text:
+                                    `🚫 *Anti-WA Auto-Kick*\n\n` +
+                                    `*+${senderNumber}* was removed after *${maxWarnings} violations*.\n\n` +
+                                    `Reason: Repeatedly sending flagged cyber bullying content.\n\n` +
+                                    `_Anti-WA — Zero tolerance for cyber bullying._`
+                            });
+                            await axios.post('http://localhost:3001/api/stats/kick', {
+                                groupJid: m.chat,
+                                kickedNumber: senderNumber,
+                                kickedBy: 'auto'
+                            }).catch(() => {});
+                        } else {
+                            await sock.sendMessage(m.chat, {
+                                text:
+                                    `⚠️ *Anti-WA Warning ${warnings}/${maxWarnings}*\n\n` +
+                                    `@${senderNumber} sent flagged content that was removed.\n\n` +
+                                    `${maxWarnings - warnings} more violation(s) before auto-kick.\n\n` +
+                                    `_Anti-WA — Stop Cyber Bullying._`,
+                                mentions: [sender]
+                            });
+                        }
                     }
                 }
             } catch {}

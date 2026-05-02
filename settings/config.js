@@ -1,13 +1,9 @@
-
-// 漏 2025 Debraj. All Rights Reserved.
-// respect the work, don鈥檛 just copy-paste.
-
-const fs = require('fs')
+const fs = require('fs');
 
 const config = {
     owner: "-",
     botNumber: "-",
-    setPair: "K0MRAID1",
+    setPair: "ANTIWA1",
     thumbUrl: "https://i.imgur.com/IkEv97P.jpeg",
     session: "sessions",
     status: {
@@ -23,19 +19,19 @@ const config = {
     },
     mess: {
         owner: 'This command is only for the bot owner!',
-        done: 'Mode changed successfully!',
+        done: 'Done successfully!',
         error: 'Something went wrong!',
         wait: 'Please wait...'
     },
     settings: {
-        title: "Simple WA Base Bot",
-        packname: 'WA-BASE',
-        description: "this script was created by Debraj",
-        author: 'https://www.github.com/OfficialKango',
-        footer: "饾棈饾柧饾梾饾柧饾梹饾棆饾柡饾梿: @official_kango"
+        title: "Anti-WA",
+        packname: 'Anti-WA',
+        description: "Anti-WA: Stop Cyber Bullying on WhatsApp",
+        author: 'https://github.com/OfficialKango',
+        footer: "Anti-WA | Stop Cyber Bullying"
     },
     newsletter: {
-        name: "Simple WA Base Bot",
+        name: "Anti-WA",
         id: "0@newsletter"
     },
     api: {
@@ -43,17 +39,21 @@ const config = {
         apikey: "hector"
     },
     sticker: {
-        packname: "Simple WA Base Bot",
-        author: "WA-BASE"
+        packname: "Anti-WA",
+        author: "Anti-WA Bot"
+    },
+    antiwa: {
+        maxWarnings: 3,
+        apiBase: "http://localhost:3001/api"
     }
-}
+};
 
 module.exports = config;
 
-let file = require.resolve(__filename)
+let file = require.resolve(__filename);
 require('fs').watchFile(file, () => {
-  require('fs').unwatchFile(file)
-  console.log('\x1b[0;32m'+__filename+' \x1b[1;32mupdated!\x1b[0m')
-  delete require.cache[file]
-  require(file)
-})
+    require('fs').unwatchFile(file);
+    console.log('\x1b[0;32m' + __filename + ' \x1b[1;32mupdated!\x1b[0m');
+    delete require.cache[file];
+    require(file);
+});

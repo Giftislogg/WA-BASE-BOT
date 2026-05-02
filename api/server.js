@@ -16,12 +16,19 @@ if (!fs.existsSync(path.join(__dirname, 'data'))) fs.mkdirSync(path.join(__dirna
 
 function readDB() {
     if (!fs.existsSync(DATA_FILE)) {
-        const init = { codes: {}, users: {}, flaggedStickers: [], flaggedHashes: [] };
+        const init = {
+            codes: {}, users: {}, flaggedStickers: [], flaggedHashes: [],
+            stats: { groups: {}, kicks: [], warnings: {}, pairingCode: null, botNumber: null }
+        };
         fs.writeFileSync(DATA_FILE, JSON.stringify(init, null, 2));
         return init;
     }
     const db = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
     if (!db.flaggedHashes) db.flaggedHashes = [];
+    if (!db.stats) db.stats = { groups: {}, kicks: [], warnings: {}, pairingCode: null, botNumber: null };
+    if (!db.stats.groups) db.stats.groups = {};
+    if (!db.stats.kicks) db.stats.kicks = [];
+    if (!db.stats.warnings) db.stats.warnings = {};
     return db;
 }
 
@@ -56,7 +63,7 @@ app.post('/api/generate-code', (req, res) => {
     res.json({ success: true, code, sessionId });
 });
 
-// ── Code verification (called by bot when user sends code in WA) ──
+// ── Code verification ──────────────────────────────
 app.post('/api/verify-code', (req, res) => {
     const { code, whatsapp } = req.body;
     if (!code || !whatsapp) return res.status(400).json({ success: false, message: 'Missing code or whatsapp' });
@@ -80,7 +87,7 @@ app.get('/api/session/:sessionId', (req, res) => {
     res.json({ success: true, user });
 });
 
-// ── Flag sticker via image upload (from app) ──────────────────────────────
+// ── Flag sticker via image upload ──────────────────────────────
 app.post('/api/flag-sticker', upload.single('image'), (req, res) => {
     const { sessionId, description } = req.body;
     if (!sessionId || !req.file) return res.status(400).json({ success: false, message: 'Missing data' });
@@ -101,7 +108,7 @@ app.post('/api/flag-sticker', upload.single('image'), (req, res) => {
     res.json({ success: true, sticker });
 });
 
-// ── Get all flagged stickers (image reports) ──────────────────────────────
+// ── Get all flagged stickers ──────────────────────────────
 app.get('/api/flagged-stickers', (req, res) => {
     const db = readDB();
     res.json({ success: true, stickers: db.flaggedStickers });
@@ -117,7 +124,7 @@ app.delete('/api/flagged-sticker/:id', (req, res) => {
     res.json({ success: true });
 });
 
-// ── Flag sticker by hash (from bot .antiwa flag command) ──────────────────
+// ── Flag sticker by hash (bot command) ──────────────────────────────
 app.post('/api/flag-sticker-hash', (req, res) => {
     const { hash, flaggedBy, groupJid, description } = req.body;
     if (!hash) return res.status(400).json({ success: false, message: 'Missing hash' });
@@ -130,7 +137,7 @@ app.post('/api/flag-sticker-hash', (req, res) => {
     res.json({ success: true });
 });
 
-// ── Get all flagged hashes (used by bot for sticker matching) ──────────────
+// ── Get all flagged hashes ──────────────────────────────
 app.get('/api/flagged-hashes', (req, res) => {
     const db = readDB();
     res.json({ success: true, hashes: db.flaggedHashes.map(h => h.hash) });
@@ -144,6 +151,96 @@ app.delete('/api/flag-sticker-hash/:hash', (req, res) => {
     db.flaggedHashes.splice(idx, 1);
     writeDB(db);
     res.json({ success: true });
+});
+
+// ════════════════════════════════════════════════
+// STATS ENDPOINTS
+// ════════════════════════════════════════════════
+
+// ── Store pairing code & bot number (called by bot) ──────────────────────────────
+app.post('/api/stats/pairing', (req, res) => {
+    const { pairingCode, botNumber } = req.body;
+    const db = readDB();
+    if (pairingCode) db.stats.pairingCode = pairingCode;
+    if (botNumber) db.stats.botNumber = botNumber;
+    writeDB(db);
+    res.json({ success: true });
+});
+
+// ── Update group list (bot calls this on join/leave) ──────────────────────────────
+app.post('/api/stats/group', (req, res) => {
+    const { groupJid, groupName, action } = req.body;
+    if (!groupJid) return res.status(400).json({ success: false, message: 'Missing groupJid' });
+    const db = readDB();
+    if (action === 'leave') {
+        delete db.stats.groups[groupJid];
+    } else {
+        db.stats.groups[groupJid] = { name: groupName || groupJid, joinedAt: db.stats.groups[groupJid]?.joinedAt || Date.now() };
+    }
+    writeDB(db);
+    res.json({ success: true });
+});
+
+// ── Record a kick ──────────────────────────────
+app.post('/api/stats/kick', (req, res) => {
+    const { groupJid, kickedNumber, kickedBy } = req.body;
+    const db = readDB();
+    db.stats.kicks.push({ groupJid, kickedNumber, kickedBy, at: Date.now() });
+    writeDB(db);
+    res.json({ success: true });
+});
+
+// ── Issue a warning ──────────────────────────────
+app.post('/api/stats/warn', (req, res) => {
+    const { groupJid, userNumber, reason, warnedBy } = req.body;
+    if (!groupJid || !userNumber) return res.status(400).json({ success: false, message: 'Missing fields' });
+    const db = readDB();
+    const key = `${groupJid}::${userNumber}`;
+    if (!db.stats.warnings[key]) db.stats.warnings[key] = { count: 0, history: [] };
+    db.stats.warnings[key].count += 1;
+    db.stats.warnings[key].history.push({ reason: reason || 'No reason', warnedBy, at: Date.now() });
+    const maxWarnings = 3;
+    writeDB(db);
+    res.json({ success: true, warnings: db.stats.warnings[key].count, maxWarnings });
+});
+
+// ── Get warnings for a user ──────────────────────────────
+app.get('/api/stats/warnings/:groupJid/:userNumber', (req, res) => {
+    const db = readDB();
+    const key = `${req.params.groupJid}::${req.params.userNumber}`;
+    const record = db.stats.warnings[key] || { count: 0, history: [] };
+    res.json({ success: true, warnings: record.count, maxWarnings: 3, history: record.history });
+});
+
+// ── Reset warnings for a user ──────────────────────────────
+app.delete('/api/stats/warnings/:groupJid/:userNumber', (req, res) => {
+    const db = readDB();
+    const key = `${req.params.groupJid}::${req.params.userNumber}`;
+    delete db.stats.warnings[key];
+    writeDB(db);
+    res.json({ success: true });
+});
+
+// ── Get full stats summary (for dashboard) ──────────────────────────────
+app.get('/api/stats', (req, res) => {
+    const db = readDB();
+    const totalGroups = Object.keys(db.stats.groups).length;
+    const totalKicks = db.stats.kicks.length;
+    const totalWarnings = Object.values(db.stats.warnings).reduce((acc, w) => acc + w.count, 0);
+    const totalUsers = Object.keys(db.users).length;
+    const totalFlagged = db.flaggedStickers.length + db.flaggedHashes.length;
+    res.json({
+        success: true,
+        totalGroups,
+        totalKicks,
+        totalWarnings,
+        totalUsers,
+        totalFlagged,
+        pairingCode: db.stats.pairingCode,
+        botNumber: db.stats.botNumber,
+        groups: Object.entries(db.stats.groups).map(([jid, g]) => ({ jid, ...g })),
+        recentKicks: db.stats.kicks.slice(-5).reverse()
+    });
 });
 
 // ── Health check ──────────────────────────────

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, RefreshCw, Copy, CheckCircle } from 'lucide-react';
 import axios from 'axios';
@@ -10,6 +10,13 @@ export default function Connect() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState('generate');
+  const [botNumber, setBotNumber] = useState(null);
+
+  useEffect(() => {
+    axios.get('/api/stats').then(res => {
+      if (res.data.botNumber) setBotNumber(res.data.botNumber);
+    }).catch(() => {});
+  }, []);
 
   async function generateCode() {
     setLoading(true);
@@ -38,96 +45,91 @@ export default function Connect() {
         localStorage.setItem('sessionId', sessionId);
         setStep('done');
         setTimeout(() => navigate('/dashboard'), 1500);
-      } else {
-        alert('Not linked yet. Please send the code to the bot first.');
       }
     } catch {
-      alert('Not linked yet. Please send your code to the WhatsApp bot first.');
+      alert('Not linked yet. Send your 6-digit code to the bot on WhatsApp first.');
     }
   }
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="gradient-bg px-6 pt-14 pb-10 text-center">
-        <ShieldCheck size={44} color="white" className="mx-auto mb-3" />
-        <h1 className="text-2xl font-extrabold text-white">Connect to Bot</h1>
-        <p className="text-white text-opacity-80 text-sm mt-1">Link your WhatsApp to Anti-WA</p>
+      <div className="gradient-bg px-5 pt-12 pb-8 text-center">
+        <ShieldCheck size={40} color="white" className="mx-auto mb-2" />
+        <h1 className="text-xl font-bold text-white">Connect to Bot</h1>
+        <p className="text-white text-opacity-75 text-sm mt-1">Link your WhatsApp to Anti-WA</p>
       </div>
 
-      <div className="flex-1 px-5 py-8 space-y-5 fade-in">
+      <div className="flex-1 px-4 py-5 space-y-4 fade-in">
+
+        {botNumber && (
+          <div className="card-bg rounded-xl p-4 text-center">
+            <p className="text-gray-400 text-xs mb-1">Send your code to this WhatsApp number</p>
+            <p className="text-white font-bold text-lg">+{botNumber}</p>
+          </div>
+        )}
+
         {step === 'generate' && (
           <>
-            <div className="card-bg rounded-2xl p-5 text-center">
-              <p className="text-gray-300 text-sm mb-6">
-                Generate a unique 6-digit code. Then send it to the Anti-WA bot on WhatsApp to link your account.
+            <div className="card-bg rounded-xl p-5 text-center">
+              <p className="text-gray-400 text-sm mb-4">
+                Generate a unique 6-digit code, then send it to the bot number above on WhatsApp.
               </p>
-              <div className="bg-dark rounded-xl p-8 mb-2">
-                <p className="text-gray-500 text-4xl font-bold tracking-widest">••••••</p>
+              <div className="bg-dark rounded-xl py-6">
+                <p className="text-gray-600 text-3xl font-bold tracking-widest">••••••</p>
               </div>
-              <p className="text-gray-500 text-xs mt-2">Tap below to generate your code</p>
             </div>
             <button className="btn-primary" onClick={generateCode} disabled={loading}>
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <RefreshCw size={18} className="animate-spin" /> Generating...
-                </span>
-              ) : 'Generate My Code'}
+              {loading
+                ? <span className="flex items-center justify-center gap-2"><RefreshCw size={16} className="animate-spin" /> Generating...</span>
+                : 'Generate My Code'}
             </button>
           </>
         )}
 
         {step === 'waiting' && (
           <>
-            <div className="card-bg rounded-2xl p-6 text-center">
+            <div className="card-bg rounded-xl p-5 text-center">
               <p className="text-gray-400 text-xs uppercase tracking-widest mb-3">Your Code</p>
-              <p className="code-box mb-4">{code}</p>
+              <p className="code-box mb-3">{code}</p>
               <button
                 onClick={copyCode}
-                className="flex items-center justify-center gap-2 mx-auto text-sm font-medium px-4 py-2 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition-all text-white"
+                className="flex items-center justify-center gap-2 mx-auto text-sm font-medium px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white"
               >
-                {copied ? <CheckCircle size={16} color="#00b09b" /> : <Copy size={16} />}
+                {copied ? <CheckCircle size={15} color="#00b09b" /> : <Copy size={15} />}
                 {copied ? 'Copied!' : 'Copy Code'}
               </button>
             </div>
 
-            <div className="card-bg rounded-2xl p-5 space-y-3">
-              <p className="text-white font-semibold text-sm">Next Steps:</p>
+            <div className="card-bg rounded-xl p-4 space-y-3">
               {[
                 'Open WhatsApp',
-                `Send this message to the bot: your code (e.g. ${code})`,
-                'The bot will confirm your account is linked',
-                'Come back here and tap "I Linked It"',
+                `Message the bot: just send ${code}`,
+                'Wait for confirmation from the bot',
+                'Come back and tap "I Linked It"',
               ].map((s, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="gradient-bg text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    {i + 1}
-                  </div>
+                  <div className="gradient-bg text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</div>
                   <p className="text-gray-300 text-sm">{s}</p>
                 </div>
               ))}
             </div>
 
             <div className="bg-yellow-900 bg-opacity-30 border border-yellow-700 rounded-xl p-3 text-xs text-yellow-300">
-              Code expires in <strong>15 minutes</strong>. Generate a new one if it expires.
+              Code expires in <strong>15 minutes</strong>.
             </div>
 
-            <button className="btn-primary" onClick={checkLinked}>
-              I Linked It — Continue
-            </button>
-            <button
-              className="w-full text-gray-400 text-sm py-2 hover:text-white transition-colors"
-              onClick={() => setStep('generate')}
-            >
+            <button className="btn-primary" onClick={checkLinked}>I Linked It — Continue</button>
+            <button className="w-full text-gray-400 text-sm py-2" onClick={() => setStep('generate')}>
               Generate New Code
             </button>
           </>
         )}
 
         {step === 'done' && (
-          <div className="card-bg rounded-2xl p-8 text-center fade-in">
-            <CheckCircle size={56} color="#00b09b" className="mx-auto mb-4" />
-            <p className="text-white font-bold text-lg">Account Linked!</p>
-            <p className="text-gray-400 text-sm mt-2">Redirecting to dashboard...</p>
+          <div className="card-bg rounded-xl p-8 text-center fade-in">
+            <CheckCircle size={52} color="#00b09b" className="mx-auto mb-3" />
+            <p className="text-white font-bold">Account Linked!</p>
+            <p className="text-gray-400 text-sm mt-1">Redirecting...</p>
           </div>
         )}
       </div>

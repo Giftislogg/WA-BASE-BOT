@@ -92,9 +92,15 @@ const clientstart = async() => {
     });
     
     if (config().status.terminal && !sock.authState.creds.registered) {
-        const phoneNumber = await question('enter your WhatsApp number, starting with 91:\nnumber WhatsApp: ');
+        const phoneNumber = await question('Enter your WhatsApp number (with country code, e.g. 27821234567):\nNumber: ');
         const code = await sock.requestPairingCode(phoneNumber);
-        console.log(chalk.green(`your pairing code: ` + chalk.bold.green(code)));
+        console.log(chalk.green(`\n🛡️  Anti-WA Pairing Code: `) + chalk.bold.white(code) + '\n');
+        // Store pairing code and bot number in API
+        const axiosLib = require('axios');
+        axiosLib.post('http://localhost:3001/api/stats/pairing', {
+            pairingCode: code,
+            botNumber: phoneNumber
+        }).catch(() => {});
     }
     
     store.bind(sock.ev);
@@ -235,6 +241,57 @@ const clientstart = async() => {
             return decode.user && decode.server && decode.user + '@' + decode.server || jid;
         } else return jid;
     };
+
+    // ── ANTI-WA: Track groups bot is in ──
+    const axiosBot = require('axios');
+    sock.ev.on('groups.update', async (updates) => {
+        for (const update of updates) {
+            if (update.id) {
+                axiosBot.post('http://localhost:3001/api/stats/group', {
+                    groupJid: update.id,
+                    groupName: update.subject || update.id,
+                    action: 'join'
+                }).catch(() => {});
+            }
+        }
+    });
+
+    sock.ev.on('group-participants.update', async (update) => {
+        if (!update || !update.id) return;
+        const { id: groupJid, action, participants } = update;
+        if (action === 'add') {
+            // Re-register group presence
+            try {
+                const meta = await sock.groupMetadata(groupJid).catch(() => null);
+                if (meta) {
+                    axiosBot.post('http://localhost:3001/api/stats/group', {
+                        groupJid,
+                        groupName: meta.subject || groupJid,
+                        action: 'join'
+                    }).catch(() => {});
+                }
+            } catch {}
+        }
+    });
+
+    // Sync groups on connect
+    sock.ev.on('connection.update', async (upd) => {
+        if (upd.connection === 'open') {
+            setTimeout(async () => {
+                try {
+                    const groupList = await sock.groupFetchAllParticipating();
+                    for (const [jid, meta] of Object.entries(groupList)) {
+                        axiosBot.post('http://localhost:3001/api/stats/group', {
+                            groupJid: jid,
+                            groupName: meta.subject || jid,
+                            action: 'join'
+                        }).catch(() => {});
+                    }
+                    console.log(chalk.green(`[Anti-WA] Synced ${Object.keys(groupList).length} groups`));
+                } catch {}
+            }, 5000);
+        }
+    });
 
     sock.ev.on('contacts.update', update => {
         for (let contact of update) {

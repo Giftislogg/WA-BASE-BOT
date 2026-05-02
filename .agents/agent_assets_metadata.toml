@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "TW7hifrpGEryKZRI1q7QA"
+uri = "file://AntiWA-debug.zip"
+type = "unspecified"
+title = "Anti-WA Debug APK (zip) — Install on Android"
