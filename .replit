@@ -68,6 +68,10 @@ externalPort = 80
 localPort = 5000
 externalPort = 5000
 
+[[ports]]
+localPort = 5001
+externalPort = 3000
+
 [deployment]
 deploymentTarget = "vm"
 run = ["bash", "-c", "node api/server.js & cd frontend && npm run build && npx serve -s dist -l 5000 & node index.js"]
