@@ -1,5 +1,17 @@
 {
   "codes": {
+    "598156": {
+      "sessionId": "3a281ae8287827352e51722f4ad6f84d",
+      "createdAt": 1777793274784,
+      "used": false,
+      "whatsapp": null
+    },
+    "662468": {
+      "sessionId": "57ed81c83ab162ada82d6c2c71f015a7",
+      "createdAt": 1777793165270,
+      "used": false,
+      "whatsapp": null
+    },
     "793065": {
       "sessionId": "030b5eeec8ef66169236fd1751a44fc8",
       "createdAt": 1777793053865,
