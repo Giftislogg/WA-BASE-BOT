@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Flag, RefreshCw, Trash2, CheckCircle, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
+import API from '../lib/api';
 
 export default function Flagged() {
   const [stickers, setStickers] = useState([]);
@@ -9,7 +10,7 @@ export default function Flagged() {
   async function load() {
     setLoading(true);
     try {
-      const res = await axios.get('/api/flagged-stickers');
+      const res = await axios.get(`${API}/api/flagged-stickers`);
       setStickers((res.data.stickers || []).reverse());
     } catch {
       alert('Failed to load flagged stickers.');
@@ -23,7 +24,7 @@ export default function Flagged() {
   async function remove(id) {
     if (!confirm('Remove this flagged sticker from the list?')) return;
     try {
-      await axios.delete(`/api/flagged-sticker/${id}`);
+      await axios.delete(`${API}/api/flagged-sticker/${id}`);
       setStickers(prev => prev.filter(s => s.id !== id));
     } catch {
       alert('Failed to remove.');
@@ -67,7 +68,7 @@ export default function Flagged() {
               <div key={s.id} className="card-bg rounded-2xl overflow-hidden">
                 <div className="relative">
                   <img
-                    src={s.url}
+                    src={`${API}${s.url}`}
                     alt="flagged sticker"
                     className="w-full object-cover max-h-52"
                     onError={e => { e.target.style.display = 'none'; }}

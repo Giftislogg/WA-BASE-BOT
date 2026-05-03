@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, RefreshCw, Copy, CheckCircle } from 'lucide-react';
 import axios from 'axios';
+import API from '../lib/api';
 
 export default function Connect() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function Connect() {
   const [botNumber, setBotNumber] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/stats').then(res => {
+    axios.get(`${API}/api/stats`).then(res => {
       if (res.data.botNumber) setBotNumber(res.data.botNumber);
     }).catch(() => {});
   }, []);
@@ -21,12 +22,13 @@ export default function Connect() {
   async function generateCode() {
     setLoading(true);
     try {
-      const res = await axios.post('/api/generate-code');
+      const res = await axios.post(`${API}/api/generate-code`);
+      if (!res.data.code) throw new Error('No code returned');
       setCode(res.data.code);
       setSessionId(res.data.sessionId);
       setStep('waiting');
     } catch {
-      alert('Failed to generate code. Please try again.');
+      alert('Failed to generate code. Make sure you are connected to the internet and try again.');
     } finally {
       setLoading(false);
     }
@@ -40,7 +42,7 @@ export default function Connect() {
 
   async function checkLinked() {
     try {
-      const res = await axios.get(`/api/session/${sessionId}`);
+      const res = await axios.get(`${API}/api/session/${sessionId}`);
       if (res.data.success) {
         localStorage.setItem('sessionId', sessionId);
         setStep('done');

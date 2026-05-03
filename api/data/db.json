@@ -6,6 +6,18 @@
       "used": false,
       "whatsapp": null
     },
+    "388403": {
+      "sessionId": "351f21d1022bea5de0a4c75c78494522",
+      "createdAt": 1777797520266,
+      "used": false,
+      "whatsapp": null
+    },
+    "520610": {
+      "sessionId": "ca9b1252a597749e01dbce936b098c63",
+      "createdAt": 1777797848495,
+      "used": false,
+      "whatsapp": null
+    },
     "598156": {
       "sessionId": "3a281ae8287827352e51722f4ad6f84d",
       "createdAt": 1777793274784,
@@ -33,6 +45,12 @@
     "803553": {
       "sessionId": "769da12a1f70cadfb95876760f41a31e",
       "createdAt": 1777792911411,
+      "used": false,
+      "whatsapp": null
+    },
+    "883649": {
+      "sessionId": "e4fdeb14df7f586a5fadf089de445e6a",
+      "createdAt": 1777796990352,
       "used": false,
       "whatsapp": null
     },

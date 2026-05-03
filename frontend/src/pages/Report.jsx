@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, Image, CheckCircle, X, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
+import API from '../lib/api';
 
 export default function Report() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function Report() {
       formData.append('image', file);
       formData.append('sessionId', sessionId);
       formData.append('description', description.trim());
-      await axios.post('/api/flag-sticker', formData, {
+      await axios.post(`${API}/api/flag-sticker`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setSuccess(true);

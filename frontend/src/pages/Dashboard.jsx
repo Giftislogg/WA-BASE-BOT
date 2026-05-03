@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Flag, Upload, Users, Zap, AlertTriangle, UserX } from 'lucide-react';
+import { ShieldCheck, Flag, Upload, Users, AlertTriangle, UserX } from 'lucide-react';
 import axios from 'axios';
+import API from '../lib/api';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/stats')
+    axios.get(`${API}/api/stats`)
       .then(res => setStats(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));

@@ -44,7 +44,7 @@ const config = {
     },
     antiwa: {
         maxWarnings: 3,
-        apiBase: "http://127.0.0.1:3001/api"
+        apiBase: "https://1e421c04-2553-4acf-95e0-576c929cb462-00-1vpr8470lkf74.spock.replit.dev/api"
     }
 };
 
