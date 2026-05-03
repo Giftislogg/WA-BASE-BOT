@@ -1,0 +1,32 @@
+{
+  "codes": {
+    "793065": {
+      "sessionId": "030b5eeec8ef66169236fd1751a44fc8",
+      "createdAt": 1777793053865,
+      "used": false,
+      "whatsapp": null
+    },
+    "803553": {
+      "sessionId": "769da12a1f70cadfb95876760f41a31e",
+      "createdAt": 1777792911411,
+      "used": false,
+      "whatsapp": null
+    },
+    "975508": {
+      "sessionId": "c460aace86076af683eb879e8ac120ec",
+      "createdAt": 1777792991244,
+      "used": false,
+      "whatsapp": null
+    }
+  },
+  "users": {},
+  "flaggedStickers": [],
+  "flaggedHashes": [],
+  "stats": {
+    "groups": {},
+    "kicks": [],
+    "warnings": {},
+    "pairingCode": null,
+    "botNumber": null
+  }
+}

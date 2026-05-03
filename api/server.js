@@ -246,7 +246,7 @@ app.get('/api/stats', (req, res) => {
 // ── Health check ──────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
-app.listen(PORT, 'localhost', () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`[Anti-WA API] Running on port ${PORT}`);
 });
 
