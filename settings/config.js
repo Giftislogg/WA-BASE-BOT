@@ -44,7 +44,7 @@ const config = {
     },
     antiwa: {
         maxWarnings: 3,
-        apiBase: "http://localhost:3001/api"
+        apiBase: "http://127.0.0.1:3001/api"
     }
 };
 

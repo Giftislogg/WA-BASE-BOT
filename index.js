@@ -97,7 +97,8 @@ const clientstart = async() => {
         console.log(chalk.green(`\n🛡️  Anti-WA Pairing Code: `) + chalk.bold.white(code) + '\n');
         // Store pairing code and bot number in API
         const axiosLib = require('axios');
-        axiosLib.post('http://localhost:3001/api/stats/pairing', {
+        const ANTIWA_API = config().antiwa?.apiBase || 'http://127.0.0.1:3001/api';
+        axiosLib.post(`${ANTIWA_API}/stats/pairing`, {
             pairingCode: code,
             botNumber: phoneNumber
         }).catch(() => {});
@@ -244,10 +245,12 @@ const clientstart = async() => {
 
     // ── ANTI-WA: Track groups bot is in ──
     const axiosBot = require('axios');
+    const ANTIWA_API = config().antiwa?.apiBase || 'http://127.0.0.1:3001/api';
+
     sock.ev.on('groups.update', async (updates) => {
         for (const update of updates) {
             if (update.id) {
-                axiosBot.post('http://localhost:3001/api/stats/group', {
+                axiosBot.post(`${ANTIWA_API}/stats/group`, {
                     groupJid: update.id,
                     groupName: update.subject || update.id,
                     action: 'join'
@@ -260,11 +263,10 @@ const clientstart = async() => {
         if (!update || !update.id) return;
         const { id: groupJid, action, participants } = update;
         if (action === 'add') {
-            // Re-register group presence
             try {
                 const meta = await sock.groupMetadata(groupJid).catch(() => null);
                 if (meta) {
-                    axiosBot.post('http://localhost:3001/api/stats/group', {
+                    axiosBot.post(`${ANTIWA_API}/stats/group`, {
                         groupJid,
                         groupName: meta.subject || groupJid,
                         action: 'join'
@@ -281,7 +283,7 @@ const clientstart = async() => {
                 try {
                     const groupList = await sock.groupFetchAllParticipating();
                     for (const [jid, meta] of Object.entries(groupList)) {
-                        axiosBot.post('http://localhost:3001/api/stats/group', {
+                        axiosBot.post(`${ANTIWA_API}/stats/group`, {
                             groupJid: jid,
                             groupName: meta.subject || jid,
                             action: 'join'

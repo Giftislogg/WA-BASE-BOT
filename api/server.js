@@ -94,10 +94,27 @@ app.post('/api/flag-sticker', upload.single('image'), (req, res) => {
     const db = readDB();
     const user = Object.values(db.users).find(u => u.sessionId === sessionId);
     if (!user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    // Compute SHA-256 hash of the uploaded image so the bot can detect it in groups
+    const fileBuffer = fs.readFileSync(req.file.path);
+    const imageHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+
+    // Add hash to flaggedHashes if not already there
+    if (!db.flaggedHashes.find(h => h.hash === imageHash)) {
+        db.flaggedHashes.push({
+            hash: imageHash,
+            flaggedBy: sessionId,
+            groupJid: null,
+            description: description || 'Reported via app',
+            flaggedAt: Date.now()
+        });
+    }
+
     const sticker = {
         id: crypto.randomBytes(8).toString('hex'),
         filename: req.file.filename,
         url: `/uploads/${req.file.filename}`,
+        hash: imageHash,
         description: description || '',
         reportedBy: user.sessionId,
         reportedAt: Date.now(),

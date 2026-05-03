@@ -277,7 +277,8 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
         // ── ANTI-WA: Auto code linking (private chat, 6-digit number) ──
         if (!isGroup && !isBot && /^\d{6}$/.test(budy.trim())) {
             try {
-                const antiwaRes = await axios.post('http://localhost:3001/api/verify-code', {
+                const ANTIWA_API = config.antiwa?.apiBase || 'http://127.0.0.1:3001/api';
+                const antiwaRes = await axios.post(`${ANTIWA_API}/verify-code`, {
                     code: budy.trim(),
                     whatsapp: senderNumber
                 });
@@ -307,7 +308,8 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
         const isMediaMsg = m.mtype === 'stickerMessage' || m.mtype === 'imageMessage';
         if (isGroup && isMediaMsg && !isBot) {
             try {
-                const hashesRes = await axios.get('http://localhost:3001/api/flagged-hashes');
+                const ANTIWA_API = config.antiwa?.apiBase || 'http://127.0.0.1:3001/api';
+                const hashesRes = await axios.get(`${ANTIWA_API}/flagged-hashes`);
                 const flaggedHashes = hashesRes.data.hashes || [];
                 if (flaggedHashes.length > 0) {
                     const { downloadContentFromMessage: dlContent } = await import('@whiskeysockets/baileys');
@@ -322,7 +324,7 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
                         await sock.sendMessage(m.chat, { delete: m.key }).catch(() => {});
                         console.log(chalk.red(`🚫 [Anti-WA] Flagged ${mediaType} detected in ${groupName} from ${senderNumber}`));
                         // Issue warning via API
-                        const warnRes = await axios.post('http://localhost:3001/api/stats/warn', {
+                        const warnRes = await axios.post(`${ANTIWA_API}/stats/warn`, {
                             groupJid: m.chat,
                             userNumber: senderNumber,
                             reason: `Sent flagged ${mediaType} (cyber bullying content)`,
@@ -339,7 +341,7 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
                                     `Reason: Repeatedly sending flagged cyber bullying content.\n\n` +
                                     `_Anti-WA — Zero tolerance for cyber bullying._`
                             });
-                            await axios.post('http://localhost:3001/api/stats/kick', {
+                            await axios.post(`${ANTIWA_API}/stats/kick`, {
                                 groupJid: m.chat,
                                 kickedNumber: senderNumber,
                                 kickedBy: 'auto'

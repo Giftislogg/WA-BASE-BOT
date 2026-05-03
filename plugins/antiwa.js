@@ -1,6 +1,7 @@
 const axios = require('axios');
+const config = require('../settings/config');
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = config.antiwa?.apiBase || 'http://127.0.0.1:3001/api';
 
 module.exports = {
     command: 'antiwa',

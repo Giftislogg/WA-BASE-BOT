@@ -1,5 +1,11 @@
 {
   "codes": {
+    "245633": {
+      "sessionId": "45f9f87f026c412e1ad3816278bce1bd",
+      "createdAt": 1777794558718,
+      "used": false,
+      "whatsapp": null
+    },
     "598156": {
       "sessionId": "3a281ae8287827352e51722f4ad6f84d",
       "createdAt": 1777793274784,
@@ -11,6 +17,12 @@
       "createdAt": 1777793165270,
       "used": false,
       "whatsapp": null
+    },
+    "748008": {
+      "sessionId": "6d5b30165005104febea602ad4aa3062",
+      "createdAt": 1777794587991,
+      "used": true,
+      "whatsapp": "27800000001"
     },
     "793065": {
       "sessionId": "030b5eeec8ef66169236fd1751a44fc8",
@@ -31,9 +43,34 @@
       "whatsapp": null
     }
   },
-  "users": {},
-  "flaggedStickers": [],
-  "flaggedHashes": [],
+  "users": {
+    "27800000001": {
+      "sessionId": "6d5b30165005104febea602ad4aa3062",
+      "linkedAt": 1777794588161,
+      "isAdmin": false
+    }
+  },
+  "flaggedStickers": [
+    {
+      "id": "8308b8e5e63e0da3",
+      "filename": "sticker_1777794595344_333aa55f.png",
+      "url": "/uploads/sticker_1777794595344_333aa55f.png",
+      "hash": "ff88bcfea2c5140f8d251faa3fc6456b9889316149856ce0681ecbc78902b59e",
+      "description": "Test bullying sticker",
+      "reportedBy": "6d5b30165005104febea602ad4aa3062",
+      "reportedAt": 1777794595349,
+      "removed": false
+    }
+  ],
+  "flaggedHashes": [
+    {
+      "hash": "ff88bcfea2c5140f8d251faa3fc6456b9889316149856ce0681ecbc78902b59e",
+      "flaggedBy": "6d5b30165005104febea602ad4aa3062",
+      "groupJid": null,
+      "description": "Test bullying sticker",
+      "flaggedAt": 1777794595348
+    }
+  ],
   "stats": {
     "groups": {},
     "kicks": [],
