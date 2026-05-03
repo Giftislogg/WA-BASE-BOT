@@ -12,6 +12,12 @@
       "used": false,
       "whatsapp": null
     },
+    "496745": {
+      "sessionId": "32ed7e18c246845ea1d73300be1dcc9f",
+      "createdAt": 1777801405034,
+      "used": false,
+      "whatsapp": null
+    },
     "520610": {
       "sessionId": "ca9b1252a597749e01dbce936b098c63",
       "createdAt": 1777797848495,
@@ -36,6 +42,12 @@
       "used": true,
       "whatsapp": "27800000001"
     },
+    "772878": {
+      "sessionId": "adb3f0c9d1240ca714c5f456ab04da7c",
+      "createdAt": 1777800611379,
+      "used": true,
+      "whatsapp": "27635630705"
+    },
     "793065": {
       "sessionId": "030b5eeec8ef66169236fd1751a44fc8",
       "createdAt": 1777793053865,
@@ -45,6 +57,12 @@
     "803553": {
       "sessionId": "769da12a1f70cadfb95876760f41a31e",
       "createdAt": 1777792911411,
+      "used": false,
+      "whatsapp": null
+    },
+    "821124": {
+      "sessionId": "9fb042987ba7f4a32ba89e8c06f0053a",
+      "createdAt": 1777799154192,
       "used": false,
       "whatsapp": null
     },
@@ -65,6 +83,11 @@
     "27800000001": {
       "sessionId": "6d5b30165005104febea602ad4aa3062",
       "linkedAt": 1777794588161,
+      "isAdmin": false
+    },
+    "27635630705": {
+      "sessionId": "adb3f0c9d1240ca714c5f456ab04da7c",
+      "linkedAt": 1777800621626,
       "isAdmin": false
     }
   },
@@ -90,10 +113,391 @@
     }
   ],
   "stats": {
-    "groups": {},
+    "groups": {
+      "120363294563256452@g.us": {
+        "name": "✪ G T A M O  •  D E P A R T M E N T S",
+        "joinedAt": 1777800569077
+      },
+      "120363323457229652@g.us": {
+        "name": "🔫 〣  T R B L E. S H O O T E R ",
+        "joinedAt": 1777800569080
+      },
+      "120363403418813140@g.us": {
+        "name": "Airtima mobile Announcements",
+        "joinedAt": 1777800569091
+      },
+      "120363287362162009@g.us": {
+        "name": "Project 101",
+        "joinedAt": 1777800569092
+      },
+      "120363358535755495@g.us": {
+        "name": "Test",
+        "joinedAt": 1777800569094
+      },
+      "120363417506557430@g.us": {
+        "name": "Riddick gguh",
+        "joinedAt": 1777800569096
+      },
+      "120363377748133778@g.us": {
+        "name": "Loool",
+        "joinedAt": 1777800569099
+      },
+      "120363172834518657@g.us": {
+        "name": "Study Group📚👩🏻‍🎓",
+        "joinedAt": 1777800569100
+      },
+      "120363400788868397@g.us": {
+        "name": "Friends group ",
+        "joinedAt": 1777800569102
+      },
+      "120363130390589119@g.us": {
+        "name": "Xhosa gents",
+        "joinedAt": 1777800569107
+      },
+      "120363348298089763@g.us": {
+        "name": "THE INHERITANCE",
+        "joinedAt": 1777800569109
+      },
+      "120363420319341147@g.us": {
+        "name": "KVRP",
+        "joinedAt": 1777800569110
+      },
+      "120363330557677536@g.us": {
+        "name": "Lithemba fashionable clothes 😍",
+        "joinedAt": 1777800569120
+      },
+      "120363376633710882@g.us": {
+        "name": "Loool",
+        "joinedAt": 1777800569221
+      },
+      "120363406413008695@g.us": {
+        "name": "Community Shield Developers",
+        "joinedAt": 1777800569361
+      },
+      "120363400737863721@g.us": {
+        "name": "𝗔𝘃𝗶- 𝘀𝗶𝗴𝗻𝗮𝗹𝘀 💵 ✈️",
+        "joinedAt": 1777800569364
+      },
+      "120363392093730576@g.us": {
+        "name": "KHS GRADE :9c 2025",
+        "joinedAt": 1777800569365
+      },
+      "120363403989427461@g.us": {
+        "name": "Aviator Signals",
+        "joinedAt": 1777800569366
+      },
+      "120363359906987486@g.us": {
+        "name": "Lool",
+        "joinedAt": 1777800569367
+      },
+      "120363424517578395@g.us": {
+        "name": "❤️🎉✈️ Betway winning games ❤️🔥✈️",
+        "joinedAt": 1777800569368
+      },
+      "120363385225881408@g.us": {
+        "name": "WATCH MA EDITS",
+        "joinedAt": 1777800569370
+      },
+      "120363417613691575@g.us": {
+        "name": "Minecraft pro's",
+        "joinedAt": 1777800569371
+      },
+      "120363388311096065@g.us": {
+        "name": "GTAMO iS FOREVER",
+        "joinedAt": 1777800569372
+      },
+      "120363182353592356@g.us": {
+        "name": "OPEN AI",
+        "joinedAt": 1777800569373
+      },
+      "120363417857290815@g.us": {
+        "name": "Joking around to improve your strength ",
+        "joinedAt": 1777800569375
+      },
+      "120363417989818279@g.us": {
+        "name": "🇿🇦 𝙇𝙐𝘾𝙔 𝙇𝙐𝘾𝙔 𝙀𝙈𝙋𝙄𝙍𝙀",
+        "joinedAt": 1777800569376
+      },
+      "120363424069464459@g.us": {
+        "name": "❤️🚀AVIATOR SIGNALS  GROUP 💰✈️🇿🇦❤️🔥",
+        "joinedAt": 1777800569395
+      },
+      "120363424338056497@g.us": {
+        "name": "Zachary Daily Winning Codes ⚽️🔥💰",
+        "joinedAt": 1777800569407
+      },
+      "120363420508089163@g.us": {
+        "name": "𝗔𝗕𝗔𝗦𝗘 𝗞𝗛𝗦 ❤️🔥",
+        "joinedAt": 1777800569408
+      },
+      "120363401527914961@g.us": {
+        "name": "....",
+        "joinedAt": 1777800569411
+      },
+      "120363309865901119@g.us": {
+        "name": "Projects ",
+        "joinedAt": 1777800569412
+      },
+      "120363261945086462@g.us": {
+        "name": "Betway punters",
+        "joinedAt": 1777800569414
+      },
+      "120363294778529549@g.us": {
+        "name": "📣 〣 M A R K E T I N G",
+        "joinedAt": 1777800569416
+      },
+      "120363421057440241@g.us": {
+        "name": "💕💕💕",
+        "joinedAt": 1777800569417
+      },
+      "120363288544772891@g.us": {
+        "name": "🪂 〣  E V E N T A S",
+        "joinedAt": 1777800569419
+      },
+      "120363419542986924@g.us": {
+        "name": "𝗔𝘃𝗶-𝗠𝗦 𝗽𝗿𝗲𝗺𝗶𝘂𝗺 👑 𝘃𝘃𝗶𝗽",
+        "joinedAt": 1777800569420
+      },
+      "120363030328713204@g.us": {
+        "name": "G.8C ENG 2023📚",
+        "joinedAt": 1777800569422
+      },
+      "120363204769616709@g.us": {
+        "name": "Market conquers☠️",
+        "joinedAt": 1777800569423
+      },
+      "120363399970320644@g.us": {
+        "name": "Riddick gguh",
+        "joinedAt": 1777800569425
+      },
+      "120363404863973953@g.us": {
+        "name": "Season à4",
+        "joinedAt": 1777800569427
+      },
+      "120363233453638072@g.us": {
+        "name": "The gents",
+        "joinedAt": 1777800569429
+      },
+      "120363401847678878@g.us": {
+        "name": "📍𝗕𝗼𝗮𝗿𝗱𝗿𝗼𝗼𝗺",
+        "joinedAt": 1777800569430
+      },
+      "120363409044026145@g.us": {
+        "name": "...24hours stories",
+        "joinedAt": 1777800569431
+      },
+      "120363399546593242@g.us": {
+        "name": "Aviator Signals",
+        "joinedAt": 1777800569432
+      },
+      "120363404234954274@g.us": {
+        "name": "𝗠𝗮𝗶𝗻 𝗦𝘁𝘂𝗱𝗶𝗼𝘀 𝗠𝘇𝗮𝗻𝘀𝗶 𝗣𝗨𝗕𝗚 𝗦𝗾𝘂𝗮𝗱",
+        "joinedAt": 1777800569434
+      },
+      "120363031910746411@g.us": {
+        "name": "Catholics 2025",
+        "joinedAt": 1777800569438
+      },
+      "120363386633491643@g.us": {
+        "name": "Solve",
+        "joinedAt": 1777800569439
+      },
+      "120363419969786583@g.us": {
+        "name": "🇿🇦 𝗕𝗲𝘁𝘄𝗮𝘆 &𝗛𝗼𝗹𝗹𝘆𝘄𝗼𝗼𝗱 𝗦𝗶𝗴𝗻𝗮𝗹 𝘀𝘁𝗮𝘁𝗲𝗿",
+        "joinedAt": 1777800569440
+      },
+      "120363402535997212@g.us": {
+        "name": "Maths lessons ",
+        "joinedAt": 1777800569441
+      },
+      "120363049362127910@g.us": {
+        "name": "Grade  9c mathematics  group",
+        "joinedAt": 1777800569442
+      },
+      "120363421934150944@g.us": {
+        "name": "Speak xhosa only 😣😣",
+        "joinedAt": 1777800569444
+      },
+      "120363388579542773@g.us": {
+        "name": "Grade 9c E.M.S GROUP 2025",
+        "joinedAt": 1777800569445
+      },
+      "120363403767494051@g.us": {
+        "name": "♥️🔥✈️the winning family 🔥♥️👌✈️",
+        "joinedAt": 1777800569447
+      },
+      "120363421396516133@g.us": {
+        "name": "120363421396516133@g.us",
+        "joinedAt": 1777800569448
+      },
+      "120363420630720336@g.us": {
+        "name": "SIHLEKA UWAYAWAYA😜😜",
+        "joinedAt": 1777800569449
+      },
+      "120363401646206632@g.us": {
+        "name": "ADMINS",
+        "joinedAt": 1777800569450
+      },
+      "120363425144884110@g.us": {
+        "name": "Physical Sciences Grade 10C 2026",
+        "joinedAt": 1777800569451
+      },
+      "120363405242333393@g.us": {
+        "name": "ESKOM EXPO @ KHS📡🔬",
+        "joinedAt": 1777800569453
+      },
+      "120363424256743991@g.us": {
+        "name": "ClassGROUP 10C,2026",
+        "joinedAt": 1777800569455
+      },
+      "120363419801452172@g.us": {
+        "name": "Fc group",
+        "joinedAt": 1777800569456
+      },
+      "27794210966-1629815671@g.us": {
+        "name": "🌟 〣  S U P E R V I S O R S",
+        "joinedAt": 1777800569457
+      },
+      "120363399592912329@g.us": {
+        "name": "AXOLE SUPPOTERS &ENT",
+        "joinedAt": 1777800569459
+      },
+      "120363408156969082@g.us": {
+        "name": "Maths grd 8",
+        "joinedAt": 1777800569460
+      },
+      "120363318183523789@g.us": {
+        "name": "🎩 〣  L E A D E R S",
+        "joinedAt": 1777800569462
+      },
+      "120363406404090887@g.us": {
+        "name": "𝚂𝚃𝙰𝚁𝚂🤣🤣🤣",
+        "joinedAt": 1777800569464
+      },
+      "120363389062982947@g.us": {
+        "name": "AVIATOR✈️🚀 PURPLE SIGNALS 💸💰VIP",
+        "joinedAt": 1777800569466
+      },
+      "120363405827810934@g.us": {
+        "name": "Love group",
+        "joinedAt": 1777800569467
+      },
+      "120363423499575046@g.us": {
+        "name": "GROUP 5",
+        "joinedAt": 1777800569469
+      },
+      "120363424860049886@g.us": {
+        "name": "Life sciences 10C 2026",
+        "joinedAt": 1777800569470
+      },
+      "120363405555847521@g.us": {
+        "name": "10c✅",
+        "joinedAt": 1777800569471
+      },
+      "120363426152762737@g.us": {
+        "name": "SBONGAJNR AVIATOR ROBOT",
+        "joinedAt": 1777800569473
+      },
+      "120363407545064737@g.us": {
+        "name": "IT GR10",
+        "joinedAt": 1777800569475
+      },
+      "120363402666200704@g.us": {
+        "name": "🔥Onlline vibes🔥",
+        "joinedAt": 1777800569477
+      },
+      "120363425673470689@g.us": {
+        "name": "Add more people",
+        "joinedAt": 1777800569478
+      },
+      "120363425157035890@g.us": {
+        "name": "Betway winning group",
+        "joinedAt": 1777800569480
+      },
+      "120363421115669128@g.us": {
+        "name": "VIP GROUP",
+        "joinedAt": 1777800569481
+      },
+      "120363422077173390@g.us": {
+        "name": "MAIN STUDIOS COMMUNITY",
+        "joinedAt": 1777800569483
+      },
+      "27794210966-1601544647@g.us": {
+        "name": "Vivamus Aeturnum™",
+        "joinedAt": 1777800569485
+      },
+      "120363423729319791@g.us": {
+        "name": "I own this group👌🏿🎱❤️",
+        "joinedAt": 1777800569487
+      },
+      "120363195113907582@g.us": {
+        "name": "AVIATOR VVIP GROUP",
+        "joinedAt": 1777800569488
+      },
+      "120363297102779100@g.us": {
+        "name": "✪ G T A M O  •  D E P A R T M E N T S",
+        "joinedAt": 1777800569493
+      },
+      "120363425826550116@g.us": {
+        "name": ",♥️✈️FREE AVIATOR SIGNALS GROUP 🎇🔥✈️💸💴",
+        "joinedAt": 1777800569494
+      },
+      "120363224701039975@g.us": {
+        "name": "AVIATOR VIP GROUP",
+        "joinedAt": 1777800569496
+      },
+      "120363404412781761@g.us": {
+        "name": "MPR  & Confighub - Public Group",
+        "joinedAt": 1777800569497
+      },
+      "120363421179823690@g.us": {
+        "name": "༒𝗦𝗢𝗨𝗧𝗛 𝗔𝗙𝗥𝗜𝗖𝗔 𝗙𝗥𝗘𝗘 𝗜𝗡𝗧𝗘𝗥𝗡𝗘𝗧 &𝗧𝗥𝗜𝗖𝗞𝗦 ❞𝗥𝗘𝗔𝗖𝗧 𝗙𝗢𝗥 𝗣𝗟𝗨𝗚 ✉➽ 3 WARNING ⚠️",
+        "joinedAt": 1777800569499
+      },
+      "120363406222360899@g.us": {
+        "name": "✈️ AVIATOR PREDICTION APP , CODE , VPN, SIGNAL ✈️ IS AVAILABLE ✈️✈️",
+        "joinedAt": 1777800569504
+      },
+      "120363421103623778@g.us": {
+        "name": "🇿🇦 𝙇𝙐𝘾𝙔 𝙇𝙐𝘾𝙔 𝙀𝙈𝙋𝙄𝙍𝙀",
+        "joinedAt": 1777800569507
+      },
+      "120363424434671826@g.us": {
+        "name": "Aviator//Pink",
+        "joinedAt": 1777800569509
+      },
+      "120363405644608964@g.us": {
+        "name": "AVIATOR SIGNAL HACKER🚀🚀🚀",
+        "joinedAt": 1777800569592
+      },
+      "120363424536611605@g.us": {
+        "name": "✰ฅ( ̳̳𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝗧𝗼➳ l ꙰𝗕𝗹𝗮𝗰𝗸 𝘃𝗲𝗻𝗼𝗺ฅ 𝗻❧ 𝗢𝗰𝗲𝗮𝗻✦𝗕𝗼𝘆 𝗙𝗿𝗲𝗲 𝗡𝗲𝘁l ꙰❉",
+        "joinedAt": 1777800569598
+      },
+      "120363405445389247@g.us": {
+        "name": "「ᴅᴀʀᴋsᴏᴄᴋᴇᴛ ɴᴇᴛɢᴜʀᴜ ᴄᴏɴғɪɢs 」",
+        "joinedAt": 1777800569600
+      },
+      "120363426110473230@g.us": {
+        "name": "Aviator [👨‍🍳20x👨‍🍳]",
+        "joinedAt": 1777800569603
+      },
+      "120363421802497365@g.us": {
+        "name": "One trusted Avaitor helper 💻",
+        "joinedAt": 1777800569604
+      },
+      "120363403496872488@g.us": {
+        "name": "𝐋𝐢𝐚𝐦 𝐙𝐚 ||𝐆𝟐 𝐅𝐑𝐄𝐄 𝐀𝐯𝐢𝐚𝐭𝐨𝐫 𝐒𝐢𝐠𝐧𝐚𝐥𝐗𝐗 ||📈🚀🔥",
+        "joinedAt": 1777800569606
+      },
+      "120363426647351518@g.us": {
+        "name": "🌸.❤️👑AVAITOR SIGNALS GROUP🔥💙🤝",
+        "joinedAt": 1777800569609
+      }
+    },
     "kicks": [],
     "warnings": {},
-    "pairingCode": null,
-    "botNumber": null
+    "pairingCode": "FPHTHMR6",
+    "botNumber": "27635630705"
   }
 }

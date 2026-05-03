@@ -15,11 +15,11 @@ function App() {
       <div className="flex flex-col min-h-screen pb-20">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/connect" element={<Connect />} />
-          <Route path="/dashboard" element={sessionId ? <Dashboard /> : <Navigate to="/connect" />} />
-          <Route path="/report" element={sessionId ? <Report /> : <Navigate to="/connect" />} />
-          <Route path="/flagged" element={sessionId ? <Flagged /> : <Navigate to="/connect" />} />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/connect" element={sessionId ? <Navigate to="/dashboard" replace /> : <Connect />} />
+          <Route path="/dashboard" element={sessionId ? <Dashboard /> : <Navigate to="/connect" replace />} />
+          <Route path="/report" element={sessionId ? <Report /> : <Navigate to="/connect" replace />} />
+          <Route path="/flagged" element={sessionId ? <Flagged /> : <Navigate to="/connect" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         {sessionId && <NavBar />}
       </div>

@@ -1,34 +1,79 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, RefreshCw, Copy, CheckCircle } from 'lucide-react';
+import { ShieldCheck, RefreshCw, Copy, CheckCircle, Loader } from 'lucide-react';
 import axios from 'axios';
 import API from '../lib/api';
+
+async function callWithRetry(fn, retries = 3, delayMs = 1500) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+}
 
 export default function Connect() {
   const navigate = useNavigate();
   const [code, setCode] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState('generate');
   const [botNumber, setBotNumber] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API}/api/stats`).then(res => {
-      if (res.data.botNumber) setBotNumber(res.data.botNumber);
-    }).catch(() => {});
+    async function init() {
+      const existingSession = localStorage.getItem('sessionId');
+      if (existingSession) {
+        try {
+          const res = await axios.get(`${API}/api/session/${existingSession}`);
+          if (res.data.success) {
+            navigate('/dashboard', { replace: true });
+            return;
+          }
+        } catch {
+          localStorage.removeItem('sessionId');
+        }
+      }
+
+      const pendingCode = localStorage.getItem('pendingCode');
+      const pendingSession = localStorage.getItem('pendingSessionId');
+      if (pendingCode && pendingSession) {
+        setCode(pendingCode);
+        setSessionId(pendingSession);
+        setStep('waiting');
+      }
+
+      try {
+        const res = await axios.get(`${API}/api/stats`);
+        if (res.data.botNumber) setBotNumber(res.data.botNumber);
+      } catch {}
+
+      setChecking(false);
+    }
+    init();
   }, []);
 
   async function generateCode() {
     setLoading(true);
     try {
-      const res = await axios.post(`${API}/api/generate-code`);
+      const res = await callWithRetry(() =>
+        axios.post(`${API}/api/generate-code`)
+      );
       if (!res.data.code) throw new Error('No code returned');
-      setCode(res.data.code);
-      setSessionId(res.data.sessionId);
+      const newCode = res.data.code;
+      const newSession = res.data.sessionId;
+      setCode(newCode);
+      setSessionId(newSession);
+      localStorage.setItem('pendingCode', newCode);
+      localStorage.setItem('pendingSessionId', newSession);
       setStep('waiting');
     } catch {
-      alert('Failed to generate code. Make sure you are connected to the internet and try again.');
+      alert('Could not reach the server. Please check your internet connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -42,15 +87,36 @@ export default function Connect() {
 
   async function checkLinked() {
     try {
-      const res = await axios.get(`${API}/api/session/${sessionId}`);
+      const res = await callWithRetry(() =>
+        axios.get(`${API}/api/session/${sessionId}`)
+      );
       if (res.data.success) {
         localStorage.setItem('sessionId', sessionId);
+        localStorage.removeItem('pendingCode');
+        localStorage.removeItem('pendingSessionId');
         setStep('done');
-        setTimeout(() => navigate('/dashboard'), 1500);
+        setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
       }
     } catch {
-      alert('Not linked yet. Send your 6-digit code to the bot on WhatsApp first.');
+      alert('Not linked yet — send your 6-digit code to the bot on WhatsApp first, then tap here.');
     }
+  }
+
+  function resetCode() {
+    localStorage.removeItem('pendingCode');
+    localStorage.removeItem('pendingSessionId');
+    setCode(null);
+    setSessionId(null);
+    setStep('generate');
+  }
+
+  if (checking) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader size={32} color="#00b09b" className="animate-spin mb-3" />
+        <p className="text-gray-400 text-sm">Checking account status...</p>
+      </div>
+    );
   }
 
   return (
@@ -117,11 +183,11 @@ export default function Connect() {
             </div>
 
             <div className="bg-yellow-900 bg-opacity-30 border border-yellow-700 rounded-xl p-3 text-xs text-yellow-300">
-              Code expires in <strong>15 minutes</strong>.
+              Code expires in <strong>15 minutes</strong>. If it expired, generate a new one below.
             </div>
 
             <button className="btn-primary" onClick={checkLinked}>I Linked It — Continue</button>
-            <button className="w-full text-gray-400 text-sm py-2" onClick={() => setStep('generate')}>
+            <button className="w-full text-gray-400 text-sm py-2" onClick={resetCode}>
               Generate New Code
             </button>
           </>
