@@ -1,5 +1,6 @@
 const axios = require('axios');
-const API_BASE = 'http://localhost:3001/api';
+const config = require('../settings/config');
+const API_BASE = config.antiwa?.apiBase || 'http://localhost:3001/api';
 
 module.exports = {
     command: 'kick',
@@ -38,8 +39,7 @@ module.exports = {
             await sock.groupParticipantsUpdate(m.chat, [target], 'remove');
             await reply(`✅ *Anti-WA* removed *+${targetNum}* from the group.`);
 
-            // Track kick in API
-            await axios.post(`${API_BASE}/stats/kick`, {
+            axios.post(`${API_BASE}/stats/kick`, {
                 groupJid: m.chat,
                 kickedNumber: targetNum,
                 kickedBy: sender.split('@')[0]

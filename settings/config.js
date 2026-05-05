@@ -44,7 +44,8 @@ const config = {
     },
     antiwa: {
         maxWarnings: 3,
-        apiBase: "https://1e421c04-2553-4acf-95e0-576c929cb462-00-1vpr8470lkf74.spock.replit.dev/api"
+        // Set ANTIWA_API_URL env var on your hosting to point to your API server
+        apiBase: process.env.ANTIWA_API_URL || "https://0c4275e2-15fa-4f27-820b-8405f59697bf-00-hmffvotwz3cw.riker.replit.dev/api"
     }
 };
 

@@ -1,6 +1,7 @@
 const axios = require('axios');
-const API_BASE = 'http://localhost:3001/api';
-const MAX_WARNINGS = 3;
+const config = require('../settings/config');
+const API_BASE = config.antiwa?.apiBase || 'http://localhost:3001/api';
+const MAX_WARNINGS = config.antiwa?.maxWarnings || 3;
 
 module.exports = {
     command: 'warn',
@@ -30,6 +31,11 @@ module.exports = {
             return reply(`❌ Please mention or reply to the member you want to warn.\n\nUsage: *.warn @member <reason>*`);
         }
 
+        const isMember = participants.some(p => p.id === target);
+        if (!isMember) {
+            return reply(`❌ That user is not in this group.`);
+        }
+
         const targetNum = target.split('@')[0];
         try {
             const res = await axios.post(`${API_BASE}/stats/warn`, {
@@ -42,7 +48,6 @@ module.exports = {
             const { warnings, maxWarnings } = res.data;
 
             if (warnings >= maxWarnings) {
-                // Auto-kick
                 if (isBotAdmins) {
                     await sock.groupParticipantsUpdate(m.chat, [target], 'remove');
                     await reply(
@@ -50,7 +55,7 @@ module.exports = {
                         `*+${targetNum}* has been removed after *${maxWarnings} warnings*.\n\n` +
                         `Reason: ${reason || 'Repeated violations'}`
                     );
-                    await axios.post(`${API_BASE}/stats/kick`, {
+                    axios.post(`${API_BASE}/stats/kick`, {
                         groupJid: m.chat,
                         kickedNumber: targetNum,
                         kickedBy: 'auto'

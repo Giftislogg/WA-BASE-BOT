@@ -11,3 +11,9 @@ id = "TW7hifrpGEryKZRI1q7QA"
 uri = "file://AntiWA-debug.zip"
 type = "unspecified"
 title = "AntiWA-debug.zip (Fixed APK inside)"
+
+[[outputs]]
+id = "if4YO2pBGXmcdZ0D7IE3O"
+uri = "file://antiwa-bot.zip"
+type = "unspecified"
+title = "antiwa-bot.zip — Bot files only (upload to hosting)"

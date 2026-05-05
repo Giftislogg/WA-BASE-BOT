@@ -1,7 +1,8 @@
 const axios = require('axios');
+const crypto = require('crypto');
 const config = require('../settings/config');
 
-const API_BASE = config.antiwa?.apiBase || 'http://127.0.0.1:3001/api';
+const API_BASE = config.antiwa?.apiBase || 'http://localhost:3001/api';
 
 module.exports = {
     command: 'antiwa',
@@ -22,7 +23,8 @@ module.exports = {
                 `• *.antiwa status* — Check bot protection status\n\n` +
                 `To flag a sticker:\n` +
                 `• Reply to any sticker with *.antiwa flag*\n\n` +
-                `📱 Get the Anti-WA app to manage reports visually.`
+                `📱 Get the Anti-WA app to manage reports visually.\n\n` +
+                `💡 *Quick Link:* Just send your 6-digit code directly to this bot in private chat!`
             );
             return;
         }
@@ -45,7 +47,7 @@ module.exports = {
         if (sub === 'link') {
             const code = args[1];
             if (!code || !/^\d{6}$/.test(code)) {
-                await reply(`❌ Please provide your 6-digit code.\n\nExample: *.antiwa link 123456*`);
+                await reply(`❌ Please provide your 6-digit code.\n\nExample: *.antiwa link 123456*\n\n💡 Or just send the code directly to this bot in private chat!`);
                 return;
             }
             const whatsapp = sender.split('@')[0];
@@ -56,6 +58,7 @@ module.exports = {
                         `✅ *Account Linked Successfully!*\n\n` +
                         `Your WhatsApp is now connected to Anti-WA.\n` +
                         `You can now use the app to report abusive stickers.\n\n` +
+                        `📱 Open the Anti-WA app and tap *"I Linked It"* to continue.\n\n` +
                         `🛡️ Anti-WA is protecting this number.`
                     );
                 }
@@ -85,12 +88,13 @@ module.exports = {
                 return;
             }
             try {
+                // Import inline to avoid race condition
+                const { downloadContentFromMessage } = await import('@whiskeysockets/baileys');
                 const stream = await downloadContentFromMessage(quoted.msg, 'sticker');
                 let buffer = Buffer.alloc(0);
                 for await (const chunk of stream) {
                     buffer = Buffer.concat([buffer, chunk]);
                 }
-                const crypto = require('crypto');
                 const hash = crypto.createHash('sha256').update(buffer).digest('hex');
                 const res = await axios.post(`${API_BASE}/flag-sticker-hash`, {
                     hash,
@@ -100,9 +104,16 @@ module.exports = {
                 });
                 if (res.data.success) {
                     await reply(`🚫 *Sticker Flagged!*\n\nThis sticker will now be automatically removed from all groups where Anti-WA is active.`);
+                } else {
+                    await reply(`⚠️ Sticker is already flagged.`);
                 }
-            } catch {
-                await reply(`❌ Failed to flag sticker. Please try again.`);
+            } catch (e) {
+                const msg = e.response?.data?.message;
+                if (msg === 'Already flagged') {
+                    await reply(`⚠️ This sticker is already flagged.`);
+                } else {
+                    await reply(`❌ Failed to flag sticker. Please try again.`);
+                }
             }
             return;
         }
@@ -118,17 +129,17 @@ module.exports = {
                 return;
             }
             try {
+                const { downloadContentFromMessage } = await import('@whiskeysockets/baileys');
                 const stream = await downloadContentFromMessage(quoted.msg, 'sticker');
                 let buffer = Buffer.alloc(0);
                 for await (const chunk of stream) {
                     buffer = Buffer.concat([buffer, chunk]);
                 }
-                const crypto = require('crypto');
                 const hash = crypto.createHash('sha256').update(buffer).digest('hex');
                 await axios.delete(`${API_BASE}/flag-sticker-hash/${hash}`);
                 await reply(`✅ Sticker unflagged. It will no longer be auto-removed.`);
             } catch {
-                await reply(`❌ Failed to unflag sticker.`);
+                await reply(`❌ Failed to unflag sticker. It may not have been flagged.`);
             }
             return;
         }
@@ -136,9 +147,3 @@ module.exports = {
         await reply(`❓ Unknown sub-command. Use *.antiwa help* for usage.`);
     }
 };
-
-let downloadContentFromMessage;
-(async () => {
-    const baileys = await import('@whiskeysockets/baileys');
-    downloadContentFromMessage = baileys.downloadContentFromMessage;
-})();
