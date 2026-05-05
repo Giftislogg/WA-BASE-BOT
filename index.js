@@ -282,11 +282,18 @@ const clientstart = async() => {
             setTimeout(async () => {
                 try {
                     const groupList = await sock.groupFetchAllParticipating();
+                    const botJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
                     for (const [jid, meta] of Object.entries(groupList)) {
+                        const isBotAdmin = (meta.participants || []).some(p => {
+                            const pNum = (p.id || '').split('@')[0].split(':')[0];
+                            const botNum = botJid.split('@')[0];
+                            return pNum === botNum && (p.admin === 'admin' || p.admin === 'superadmin');
+                        });
                         axiosBot.post(`${ANTIWA_API}/stats/group`, {
                             groupJid: jid,
                             groupName: meta.subject || jid,
-                            action: 'join'
+                            action: 'join',
+                            isBotAdmin
                         }).catch(() => {});
                     }
                     console.log(chalk.green(`[Anti-WA] Synced ${Object.keys(groupList).length} groups`));

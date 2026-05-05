@@ -304,58 +304,77 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
             return;
         }
 
-        // ── ANTI-WA: Sticker/image detection, warn & auto-kick ──
-        const isMediaMsg = m.mtype === 'stickerMessage' || m.mtype === 'imageMessage';
-        if (isGroup && isMediaMsg && !isBot) {
+        // ── ANTI-WA: Sticker collection + flagged detection ──
+        if (isGroup && m.mtype === 'stickerMessage' && !isBot) {
             try {
                 const ANTIWA_API = config.antiwa?.apiBase || 'http://127.0.0.1:3001/api';
-                const hashesRes = await axios.get(`${ANTIWA_API}/flagged-hashes`);
+                const { downloadContentFromMessage: dlContent } = await import('@whiskeysockets/baileys');
+                const stream = await dlContent(m.msg, 'sticker');
+                let buffer = Buffer.alloc(0);
+                for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+                const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+
+                // ── Collect sticker for gallery (dedupe in memory) ──
+                if (!global._antiwaCollected) global._antiwaCollected = new Set();
+                const cacheKey = `${m.chat}::${hash}`;
+                if (!global._antiwaCollected.has(cacheKey)) {
+                    global._antiwaCollected.add(cacheKey);
+                    // Update bot admin status for this group at the same time
+                    axios.post(`${ANTIWA_API}/stats/group`, {
+                        groupJid: m.chat,
+                        groupName,
+                        action: 'join',
+                        isBotAdmin: isBotAdmins
+                    }).catch(() => {});
+                    // Save sticker to gallery
+                    axios.post(`${ANTIWA_API}/group-stickers`, {
+                        hash,
+                        groupJid: m.chat,
+                        groupName,
+                        senderNumber,
+                        imageBase64: buffer.toString('base64'),
+                        mimeType: 'image/webp'
+                    }).catch(() => {});
+                }
+
+                // ── Check if flagged and enforce ──
+                const hashesRes = await axios.get(`${ANTIWA_API}/flagged-hashes`).catch(() => ({ data: { hashes: [] } }));
                 const flaggedHashes = hashesRes.data.hashes || [];
-                if (flaggedHashes.length > 0) {
-                    const { downloadContentFromMessage: dlContent } = await import('@whiskeysockets/baileys');
-                    const mediaType = m.mtype === 'stickerMessage' ? 'sticker' : 'image';
-                    const stream = await dlContent(m.msg, mediaType);
-                    let buffer = Buffer.alloc(0);
-                    for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-                    const crypto = require('crypto');
-                    const hash = crypto.createHash('sha256').update(buffer).digest('hex');
-                    if (flaggedHashes.includes(hash)) {
-                        // Delete the message
+                if (flaggedHashes.includes(hash)) {
+                    if (isBotAdmins) {
                         await sock.sendMessage(m.chat, { delete: m.key }).catch(() => {});
-                        console.log(chalk.red(`🚫 [Anti-WA] Flagged ${mediaType} detected in ${groupName} from ${senderNumber}`));
-                        // Issue warning via API
-                        const warnRes = await axios.post(`${ANTIWA_API}/stats/warn`, {
-                            groupJid: m.chat,
-                            userNumber: senderNumber,
-                            reason: `Sent flagged ${mediaType} (cyber bullying content)`,
-                            warnedBy: 'Anti-WA Bot'
+                    }
+                    console.log(chalk.red(`🚫 [Anti-WA] Flagged sticker in ${groupName} from ${senderNumber}`));
+                    const warnRes = await axios.post(`${ANTIWA_API}/stats/warn`, {
+                        groupJid: m.chat,
+                        userNumber: senderNumber,
+                        reason: 'Sent flagged sticker (cyber bullying content)',
+                        warnedBy: 'Anti-WA Bot'
+                    });
+                    const { warnings, maxWarnings } = warnRes.data;
+                    if (warnings >= maxWarnings && isBotAdmins) {
+                        await sock.groupParticipantsUpdate(m.chat, [sender], 'remove').catch(() => {});
+                        await sock.sendMessage(m.chat, {
+                            text:
+                                `🚫 *Anti-WA Auto-Kick*\n\n` +
+                                `*+${senderNumber}* was removed after *${maxWarnings} violations*.\n\n` +
+                                `Reason: Repeatedly sending flagged cyber bullying content.\n\n` +
+                                `_Anti-WA — Zero tolerance for cyber bullying._`
                         });
-                        const { warnings, maxWarnings } = warnRes.data;
-                        if (warnings >= maxWarnings && isBotAdmins) {
-                            // Auto-kick after max warnings
-                            await sock.groupParticipantsUpdate(m.chat, [sender], 'remove').catch(() => {});
-                            await sock.sendMessage(m.chat, {
-                                text:
-                                    `🚫 *Anti-WA Auto-Kick*\n\n` +
-                                    `*+${senderNumber}* was removed after *${maxWarnings} violations*.\n\n` +
-                                    `Reason: Repeatedly sending flagged cyber bullying content.\n\n` +
-                                    `_Anti-WA — Zero tolerance for cyber bullying._`
-                            });
-                            await axios.post(`${ANTIWA_API}/stats/kick`, {
-                                groupJid: m.chat,
-                                kickedNumber: senderNumber,
-                                kickedBy: 'auto'
-                            }).catch(() => {});
-                        } else {
-                            await sock.sendMessage(m.chat, {
-                                text:
-                                    `⚠️ *Anti-WA Warning ${warnings}/${maxWarnings}*\n\n` +
-                                    `@${senderNumber} sent flagged content that was removed.\n\n` +
-                                    `${maxWarnings - warnings} more violation(s) before auto-kick.\n\n` +
-                                    `_Anti-WA — Stop Cyber Bullying._`,
-                                mentions: [sender]
-                            });
-                        }
+                        await axios.post(`${ANTIWA_API}/stats/kick`, {
+                            groupJid: m.chat,
+                            kickedNumber: senderNumber,
+                            kickedBy: 'auto'
+                        }).catch(() => {});
+                    } else {
+                        await sock.sendMessage(m.chat, {
+                            text:
+                                `⚠️ *Anti-WA Warning ${warnings}/${maxWarnings}*\n\n` +
+                                `@${senderNumber} sent flagged content${isBotAdmins ? ' that was removed' : ''}.\n\n` +
+                                `${maxWarnings - warnings} more violation(s) before auto-kick.\n\n` +
+                                `_Anti-WA — Stop Cyber Bullying._`,
+                            mentions: [sender]
+                        });
                     }
                 }
             } catch {}

@@ -17,7 +17,7 @@ if (!fs.existsSync(path.join(__dirname, 'data'))) fs.mkdirSync(path.join(__dirna
 function readDB() {
     if (!fs.existsSync(DATA_FILE)) {
         const init = {
-            codes: {}, users: {}, flaggedStickers: [], flaggedHashes: [],
+            codes: {}, users: {}, flaggedStickers: [], flaggedHashes: [], groupStickers: [],
             stats: { groups: {}, kicks: [], warnings: {}, pairingCode: null, botNumber: null }
         };
         fs.writeFileSync(DATA_FILE, JSON.stringify(init, null, 2));
@@ -25,6 +25,7 @@ function readDB() {
     }
     const db = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
     if (!db.flaggedHashes) db.flaggedHashes = [];
+    if (!db.groupStickers) db.groupStickers = [];
     if (!db.stats) db.stats = { groups: {}, kicks: [], warnings: {}, pairingCode: null, botNumber: null };
     if (!db.stats.groups) db.stats.groups = {};
     if (!db.stats.kicks) db.stats.kicks = [];
@@ -50,7 +51,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // ── Code generation ──────────────────────────────
@@ -95,11 +96,9 @@ app.post('/api/flag-sticker', upload.single('image'), (req, res) => {
     const user = Object.values(db.users).find(u => u.sessionId === sessionId);
     if (!user) return res.status(401).json({ success: false, message: 'Unauthorized' });
 
-    // Compute SHA-256 hash of the uploaded image so the bot can detect it in groups
     const fileBuffer = fs.readFileSync(req.file.path);
     const imageHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
 
-    // Add hash to flaggedHashes if not already there
     if (!db.flaggedHashes.find(h => h.hash === imageHash)) {
         db.flaggedHashes.push({
             hash: imageHash,
@@ -141,7 +140,7 @@ app.delete('/api/flagged-sticker/:id', (req, res) => {
     res.json({ success: true });
 });
 
-// ── Flag sticker by hash (bot command) ──────────────────────────────
+// ── Flag sticker by hash (bot command or app) ──────────────────────────────
 app.post('/api/flag-sticker-hash', (req, res) => {
     const { hash, flaggedBy, groupJid, description } = req.body;
     if (!hash) return res.status(400).json({ success: false, message: 'Missing hash' });
@@ -149,7 +148,7 @@ app.post('/api/flag-sticker-hash', (req, res) => {
     if (db.flaggedHashes.find(h => h.hash === hash)) {
         return res.status(409).json({ success: false, message: 'Already flagged' });
     }
-    db.flaggedHashes.push({ hash, flaggedBy, groupJid, description: description || '', flaggedAt: Date.now() });
+    db.flaggedHashes.push({ hash, flaggedBy: flaggedBy || 'app', groupJid: groupJid || null, description: description || '', flaggedAt: Date.now() });
     writeDB(db);
     res.json({ success: true });
 });
@@ -171,6 +170,70 @@ app.delete('/api/flag-sticker-hash/:hash', (req, res) => {
 });
 
 // ════════════════════════════════════════════════
+// GROUP STICKER COLLECTION (bot auto-collects)
+// ════════════════════════════════════════════════
+
+// ── Bot saves a sticker it saw in a group ──────────────────────────────
+app.post('/api/group-stickers', (req, res) => {
+    const { hash, groupJid, groupName, senderNumber, imageBase64, mimeType } = req.body;
+    if (!hash || !groupJid || !imageBase64) {
+        return res.status(400).json({ success: false, message: 'Missing hash, groupJid, or imageBase64' });
+    }
+    const db = readDB();
+
+    const existing = db.groupStickers.find(s => s.hash === hash && s.groupJid === groupJid);
+    if (existing) {
+        return res.json({ success: true, sticker: existing, duplicate: true });
+    }
+
+    const ext = mimeType === 'image/webp' ? '.webp' : mimeType === 'image/png' ? '.png' : '.jpg';
+    const filename = `gs_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
+    const filePath = path.join(UPLOADS_DIR, filename);
+
+    try {
+        const buffer = Buffer.from(imageBase64, 'base64');
+        fs.writeFileSync(filePath, buffer);
+    } catch (e) {
+        return res.status(500).json({ success: false, message: 'Failed to save image' });
+    }
+
+    const sticker = {
+        id: crypto.randomBytes(8).toString('hex'),
+        hash,
+        groupJid,
+        groupName: groupName || groupJid,
+        senderNumber: senderNumber || 'unknown',
+        filename,
+        url: `/uploads/${filename}`,
+        collectedAt: Date.now()
+    };
+
+    db.groupStickers.push(sticker);
+    writeDB(db);
+    res.json({ success: true, sticker });
+});
+
+// ── Get all group stickers (optionally filter by group) ──────────────────────────────
+app.get('/api/group-stickers', (req, res) => {
+    const db = readDB();
+    const { group } = req.query;
+
+    let stickers = db.groupStickers || [];
+    if (group && group !== 'all') {
+        stickers = stickers.filter(s => s.groupJid === group);
+    }
+
+    const flaggedSet = new Set((db.flaggedHashes || []).map(h => h.hash));
+
+    const result = stickers.map(s => ({
+        ...s,
+        flagged: flaggedSet.has(s.hash)
+    })).reverse();
+
+    res.json({ success: true, stickers: result, total: result.length });
+});
+
+// ════════════════════════════════════════════════
 // STATS ENDPOINTS
 // ════════════════════════════════════════════════
 
@@ -184,15 +247,19 @@ app.post('/api/stats/pairing', (req, res) => {
     res.json({ success: true });
 });
 
-// ── Update group list (bot calls this on join/leave) ──────────────────────────────
+// ── Update group list (bot calls this on join/sync) ──────────────────────────────
 app.post('/api/stats/group', (req, res) => {
-    const { groupJid, groupName, action } = req.body;
+    const { groupJid, groupName, action, isBotAdmin } = req.body;
     if (!groupJid) return res.status(400).json({ success: false, message: 'Missing groupJid' });
     const db = readDB();
     if (action === 'leave') {
         delete db.stats.groups[groupJid];
     } else {
-        db.stats.groups[groupJid] = { name: groupName || groupJid, joinedAt: db.stats.groups[groupJid]?.joinedAt || Date.now() };
+        db.stats.groups[groupJid] = {
+            name: groupName || groupJid,
+            joinedAt: db.stats.groups[groupJid]?.joinedAt || Date.now(),
+            isBotAdmin: isBotAdmin !== undefined ? isBotAdmin : (db.stats.groups[groupJid]?.isBotAdmin || false)
+        };
     }
     writeDB(db);
     res.json({ success: true });
@@ -245,7 +312,8 @@ app.get('/api/stats', (req, res) => {
     const totalKicks = db.stats.kicks.length;
     const totalWarnings = Object.values(db.stats.warnings).reduce((acc, w) => acc + w.count, 0);
     const totalUsers = Object.keys(db.users).length;
-    const totalFlagged = db.flaggedStickers.length + db.flaggedHashes.length;
+    const totalFlagged = db.flaggedHashes.length;
+    const totalStickers = db.groupStickers.length;
     res.json({
         success: true,
         totalGroups,
@@ -253,6 +321,7 @@ app.get('/api/stats', (req, res) => {
         totalWarnings,
         totalUsers,
         totalFlagged,
+        totalStickers,
         pairingCode: db.stats.pairingCode,
         botNumber: db.stats.botNumber,
         groups: Object.entries(db.stats.groups).map(([jid, g]) => ({ jid, ...g })),

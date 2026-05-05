@@ -4,7 +4,7 @@ import { ShieldCheck, RefreshCw, Copy, CheckCircle, Loader } from 'lucide-react'
 import axios from 'axios';
 import API from '../lib/api';
 
-async function callWithRetry(fn, retries = 3, delayMs = 1500) {
+async function callWithRetry(fn, retries = 3, delayMs = 2000) {
   for (let i = 0; i < retries; i++) {
     try {
       return await fn();
@@ -30,13 +30,22 @@ export default function Connect() {
       const existingSession = localStorage.getItem('sessionId');
       if (existingSession) {
         try {
-          const res = await axios.get(`${API}/api/session/${existingSession}`);
+          const res = await axios.get(`${API}/api/session/${existingSession}`, { timeout: 8000 });
           if (res.data.success) {
             navigate('/dashboard', { replace: true });
             return;
           }
-        } catch {
+          // Server explicitly said session not found — clear it
           localStorage.removeItem('sessionId');
+        } catch (err) {
+          if (err.response?.status === 404) {
+            // Session is genuinely invalid
+            localStorage.removeItem('sessionId');
+          } else {
+            // Network error / server sleeping — keep the session, go to dashboard
+            navigate('/dashboard', { replace: true });
+            return;
+          }
         }
       }
 
@@ -49,7 +58,7 @@ export default function Connect() {
       }
 
       try {
-        const res = await axios.get(`${API}/api/stats`);
+        const res = await axios.get(`${API}/api/stats`, { timeout: 8000 });
         if (res.data.botNumber) setBotNumber(res.data.botNumber);
       } catch {}
 
@@ -62,7 +71,7 @@ export default function Connect() {
     setLoading(true);
     try {
       const res = await callWithRetry(() =>
-        axios.post(`${API}/api/generate-code`)
+        axios.post(`${API}/api/generate-code`, {}, { timeout: 10000 })
       );
       if (!res.data.code) throw new Error('No code returned');
       const newCode = res.data.code;
@@ -80,7 +89,7 @@ export default function Connect() {
   }
 
   function copyCode() {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(code).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -88,7 +97,7 @@ export default function Connect() {
   async function checkLinked() {
     try {
       const res = await callWithRetry(() =>
-        axios.get(`${API}/api/session/${sessionId}`)
+        axios.get(`${API}/api/session/${sessionId}`, { timeout: 10000 })
       );
       if (res.data.success) {
         localStorage.setItem('sessionId', sessionId);

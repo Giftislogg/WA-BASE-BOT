@@ -1,5 +1,11 @@
 {
   "codes": {
+    "135077": {
+      "sessionId": "75bf436de23ce6a2b966887edcc6d772",
+      "createdAt": 1778003464824,
+      "used": true,
+      "whatsapp": "27635630705"
+    },
     "245633": {
       "sessionId": "45f9f87f026c412e1ad3816278bce1bd",
       "createdAt": 1777794558718,
@@ -104,8 +110,8 @@
       "isAdmin": false
     },
     "27635630705": {
-      "sessionId": "adb3f0c9d1240ca714c5f456ab04da7c",
-      "linkedAt": 1777800621626,
+      "sessionId": "75bf436de23ce6a2b966887edcc6d772",
+      "linkedAt": 1778003493423,
       "isAdmin": false
     }
   },
@@ -119,6 +125,16 @@
       "reportedBy": "6d5b30165005104febea602ad4aa3062",
       "reportedAt": 1777794595349,
       "removed": false
+    },
+    {
+      "id": "2124099528496c45",
+      "filename": "sticker_1778003778121_6838dfae.jpg",
+      "url": "/uploads/sticker_1778003778121_6838dfae.jpg",
+      "hash": "00fedb4de8e93fc45578e092497277f5802d4f93e669ddf8ed9d5eb4e242cd71",
+      "description": "This sticker is abusive becoause other learners don't like it",
+      "reportedBy": "75bf436de23ce6a2b966887edcc6d772",
+      "reportedAt": 1778003778197,
+      "removed": false
     }
   ],
   "flaggedHashes": [
@@ -128,6 +144,13 @@
       "groupJid": null,
       "description": "Test bullying sticker",
       "flaggedAt": 1777794595348
+    },
+    {
+      "hash": "00fedb4de8e93fc45578e092497277f5802d4f93e669ddf8ed9d5eb4e242cd71",
+      "flaggedBy": "75bf436de23ce6a2b966887edcc6d772",
+      "groupJid": null,
+      "description": "This sticker is abusive becoause other learners don't like it",
+      "flaggedAt": 1778003778197
     }
   ],
   "stats": {

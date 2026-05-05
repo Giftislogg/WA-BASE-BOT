@@ -16,4 +16,10 @@ title = "AntiWA-debug.zip (Fixed APK inside)"
 id = "if4YO2pBGXmcdZ0D7IE3O"
 uri = "file://antiwa-bot.zip"
 type = "unspecified"
-title = "antiwa-bot.zip — Bot files only (upload to hosting)"
+title = "antiwa-bot.zip — Updated bot files only"
+
+[[outputs]]
+id = "XyTGPYPnLqOqeopj-kR4X"
+uri = "file://AntiWA-v2-debug.zip"
+type = "unspecified"
+title = "AntiWA-v2-debug.zip — New APK (sticker gallery + bug fixes)"

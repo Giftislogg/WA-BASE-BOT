@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Flag, Upload, LogOut } from 'lucide-react';
+import { LayoutDashboard, Flag, Layers } from 'lucide-react';
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -8,14 +8,9 @@ export default function NavBar() {
 
   const tabs = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Home' },
-    { path: '/report', icon: Upload, label: 'Report' },
+    { path: '/stickers', icon: Layers, label: 'Stickers' },
     { path: '/flagged', icon: Flag, label: 'Flagged' },
   ];
-
-  function logout() {
-    localStorage.removeItem('sessionId');
-    navigate('/');
-  }
 
   return (
     <nav className="nav-bar">
@@ -26,7 +21,7 @@ export default function NavBar() {
             <button
               key={path}
               onClick={() => navigate(path)}
-              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
+              className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all ${
                 active ? 'text-primary' : 'text-gray-400'
               }`}
             >
@@ -35,13 +30,6 @@ export default function NavBar() {
             </button>
           );
         })}
-        <button
-          onClick={logout}
-          className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl text-gray-400 transition-all hover:text-red-400"
-        >
-          <LogOut size={22} strokeWidth={1.8} />
-          <span className="text-xs font-medium">Logout</span>
-        </button>
       </div>
     </nav>
   );
