@@ -1,0 +1,3 @@
+/api/* https://0c4275e2-15fa-4f27-820b-8405f59697bf-00-hmffvotwz3cw.riker.replit.dev/api/:splat 200
+/uploads/* https://0c4275e2-15fa-4f27-820b-8405f59697bf-00-hmffvotwz3cw.riker.replit.dev/uploads/:splat 200
+/* /index.html 200

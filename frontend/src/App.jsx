@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Connect from './pages/Connect.jsx';
@@ -6,9 +6,26 @@ import Dashboard from './pages/Dashboard.jsx';
 import Stickers from './pages/Stickers.jsx';
 import Flagged from './pages/Flagged.jsx';
 import NavBar from './components/NavBar.jsx';
+import OfflineScreen from './components/OfflineScreen.jsx';
 
 function App() {
   const sessionId = localStorage.getItem('sessionId');
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const up = () => setIsOnline(true);
+    const down = () => setIsOnline(false);
+    window.addEventListener('online', up);
+    window.addEventListener('offline', down);
+    return () => {
+      window.removeEventListener('online', up);
+      window.removeEventListener('offline', down);
+    };
+  }, []);
+
+  if (!isOnline) {
+    return <OfflineScreen />;
+  }
 
   return (
     <BrowserRouter>

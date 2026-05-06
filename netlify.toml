@@ -1,0 +1,24 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://0c4275e2-15fa-4f27-820b-8405f59697bf-00-hmffvotwz3cw.riker.replit.dev/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://0c4275e2-15fa-4f27-820b-8405f59697bf-00-hmffvotwz3cw.riker.replit.dev/uploads/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

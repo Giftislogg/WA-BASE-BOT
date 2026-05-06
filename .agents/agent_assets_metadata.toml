@@ -23,3 +23,9 @@ id = "XyTGPYPnLqOqeopj-kR4X"
 uri = "file://AntiWA-v2-debug.zip"
 type = "unspecified"
 title = "AntiWA-v2-debug.zip — Fixed APK (proper Gradle build)"
+
+[[outputs]]
+id = "jEsUVdZmWTywAOneA4X0j"
+uri = "file://AntiWA-v3-debug.zip"
+type = "unspecified"
+title = "AntiWA-v3-debug.zip — Fixed APK (server wake-up + offline screen)"

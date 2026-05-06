@@ -44,6 +44,13 @@ anti-wa/
 | Anti-WA API | `node api/server.js` | 3001 | console |
 | WhatsApp Bot | `node index.js` | — | console |
 
+## Netlify Web Version
+- **URL**: https://antiwa.netlify.app
+- **Config**: `netlify.toml` (root) — sets build base to `frontend/`, proxies `/api/*` and `/uploads/*` to Replit API, SPA redirect for React Router
+- **API URL hiding**: Web build uses relative `/api/...` (Netlify proxies to Replit); Replit URL never appears in JS bundle
+- **Offline screen**: `OfflineScreen.jsx` shown when `navigator.onLine === false`
+- **To deploy**: Push to GitHub → connect repo in Netlify → auto-deploys from `netlify.toml`
+
 ## APK Build
 
 - **Output**: `AntiWA-debug.apk` (4 MB) / `AntiWA-debug.zip` (for download)
