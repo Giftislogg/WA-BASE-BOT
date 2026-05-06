@@ -115,28 +115,7 @@
       "isAdmin": false
     }
   },
-  "flaggedStickers": [
-    {
-      "id": "8308b8e5e63e0da3",
-      "filename": "sticker_1777794595344_333aa55f.png",
-      "url": "/uploads/sticker_1777794595344_333aa55f.png",
-      "hash": "ff88bcfea2c5140f8d251faa3fc6456b9889316149856ce0681ecbc78902b59e",
-      "description": "Test bullying sticker",
-      "reportedBy": "6d5b30165005104febea602ad4aa3062",
-      "reportedAt": 1777794595349,
-      "removed": false
-    },
-    {
-      "id": "2124099528496c45",
-      "filename": "sticker_1778003778121_6838dfae.jpg",
-      "url": "/uploads/sticker_1778003778121_6838dfae.jpg",
-      "hash": "00fedb4de8e93fc45578e092497277f5802d4f93e669ddf8ed9d5eb4e242cd71",
-      "description": "This sticker is abusive becoause other learners don't like it",
-      "reportedBy": "75bf436de23ce6a2b966887edcc6d772",
-      "reportedAt": 1778003778197,
-      "removed": false
-    }
-  ],
+  "flaggedStickers": [],
   "flaggedHashes": [
     {
       "hash": "ff88bcfea2c5140f8d251faa3fc6456b9889316149856ce0681ecbc78902b59e",
@@ -540,5 +519,6 @@
     "warnings": {},
     "pairingCode": "FPHTHMR6",
     "botNumber": "27635630705"
-  }
+  },
+  "groupStickers": []
 }
